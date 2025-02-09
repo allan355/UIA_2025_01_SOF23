@@ -1,0 +1,6 @@
+@CRUDGenerator_HostAddress = http://localhost:5228
+
+GET {{CRUDGenerator_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
