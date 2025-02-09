@@ -55,6 +55,7 @@ app.Run();
 void addScopes(WebApplicationBuilder builder)
 {
 
-builder.Services.AddScoped<IServices, SampleServices>();
-//builder.Services.AddScoped<IServices, ProductServices>();
+    builder.Services.AddScoped<IGeneratorService, GeneratorService>();
+    builder.Services.AddScoped<IServices, SampleServices>();
+    //builder.Services.AddScoped<IServices, ProductServices>();
 }

@@ -18,6 +18,7 @@ namespace CRUDGenerator.AppDataContext
 
         // DbSet property to represent the Sample table
         public DbSet<Sample> Samples { get; set; }
+        public DbSet<DBColums> DBColums { get; set; }
 
         // Configuring the database provider and connection string
 
@@ -29,6 +30,9 @@ namespace CRUDGenerator.AppDataContext
         // Configuring the model for the Sample entity
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<DBColums>().ToTable("DBColums").HasKey(x => x.ORDINAL_POSITION);
+
             modelBuilder.Entity<Sample>().ToTable("Sample").HasKey(x => x.Id);
 
 
