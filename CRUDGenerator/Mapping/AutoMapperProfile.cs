@@ -8,15 +8,9 @@ namespace CRUDGenerator.MappingProfiles
     {
         public AutoMapperProfile()
         {
-            CreateMap<CreateSampleRequest, Sample>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
-
-            CreateMap<UpdateSampleRequest, Sample>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
+          //add more mappings here:
+CreateMap<AllanTestRequest, AllanTest>();
+CreateMap<PersonaRequest, Persona>();
         }
     }
 }

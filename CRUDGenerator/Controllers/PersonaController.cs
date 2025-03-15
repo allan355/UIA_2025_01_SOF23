@@ -1,21 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
 using CRUDGenerator.Interfaces;
 using CRUDGenerator.Contracts;
+using CRUDGenerator.Models;
 
 namespace CRUDGenerator.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SampleController : ControllerBase
+    public class PersonaController : ControllerBase
     {
-        private readonly IServices _SampleServices;
+        private readonly IPersonaServices _PersonaServices;
 
-        public SampleController(IServices sampleServices)
+        public PersonaController(IPersonaServices PersonaServices)
         {
-            _SampleServices = sampleServices;
+            _PersonaServices = PersonaServices;
         }
         [HttpPost]
-        public async Task<IActionResult> CreateSampleAsync(CreateSampleRequest request)
+        public async Task<IActionResult> CreatePersonaAsync(PersonaRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -23,7 +24,7 @@ namespace CRUDGenerator.Controllers
             }
             try
             {
-                await _SampleServices.CreateAsync(request);
+                await _PersonaServices.CreateAsync(request);
                 return Ok(new { message = "Elemento creado exitosamente" });
             }
             catch (Exception ex)
@@ -37,12 +38,12 @@ namespace CRUDGenerator.Controllers
         {
             try
             {
-                var sample = _SampleServices.GetAll();
-                if (sample == null || !sample.Any())
+                var Persona = (List<Persona>)_PersonaServices.GetAll();
+                if (Persona == null || !Persona.Any())
                 {
                     return Ok(new { message = "No se encontraron elementos" });
                 }
-                return Ok(new { message = "Elementos recuperados exitosamente", data = sample });
+                return Ok(new { message = "Elementos recuperados exitosamente", data = Persona });
             }
             catch (Exception ex)
             {
@@ -55,12 +56,12 @@ namespace CRUDGenerator.Controllers
         {
             try
             {
-                var sample = await _SampleServices.GetByIdAsync(id);
-                if (sample == null)
+                var Persona = (Persona)await _PersonaServices.GetByIdAsync(id);
+                if (Persona == null)
                 {
                     return NotFound(new { message = $"No se encontró el elemento con Id {id}." });
                 }
-                return Ok(new { message = $"Elemento con Id {id} recuperado exitosamente.", data = sample });
+                return Ok(new { message = $"Elemento con Id {id} recuperado exitosamente.", data = Persona });
             }
             catch (Exception ex)
             {
@@ -69,7 +70,7 @@ namespace CRUDGenerator.Controllers
         }
         [HttpPut("{id:guid}")]
 
-        public async Task<IActionResult> UpdateSampleAsync(Guid id, UpdateSampleRequest request)
+        public async Task<IActionResult> UpdatePersonaAsync(Guid id, PersonaRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -77,12 +78,12 @@ namespace CRUDGenerator.Controllers
             }
             try
             {
-                var sample = await _SampleServices.GetByIdAsync(id);
-                if (sample == null)
+                var Persona = await _PersonaServices.GetByIdAsync(id);
+                if (Persona == null)
                 {
                     return NotFound(new { message = $"Elemento con id {id} no encontrado" });
                 }
-                await _SampleServices.UpdateAsync(id, request);
+                await _PersonaServices.UpdateAsync(id, request);
                 return Ok(new { message = $"Elemento con id {id} actualizado exitosamente" });
             }
             catch (Exception ex)
@@ -92,11 +93,11 @@ namespace CRUDGenerator.Controllers
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> DeleteSampleAsync(Guid id)
+        public async Task<IActionResult> DeletePersonaAsync(Guid id)
         {
             try
             {
-                await _SampleServices.DeleteAsync(id);
+                await _PersonaServices.DeleteAsync(id);
                 return Ok(new { message = $"Elemento con id {id} eliminado exitosamente" });
 
             }

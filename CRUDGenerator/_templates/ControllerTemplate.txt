@@ -1,0 +1,111 @@
+using Microsoft.AspNetCore.Mvc;
+using CRUDGenerator.Interfaces;
+using CRUDGenerator.Contracts;
+using CRUDGenerator.Models;
+
+namespace CRUDGenerator.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class {{Table}}Controller : ControllerBase
+    {
+        private readonly I{{Table}}Services _{{Table}}Services;
+
+        public {{Table}}Controller(I{{Table}}Services {{Table}}Services)
+        {
+            _{{Table}}Services = {{Table}}Services;
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create{{Table}}Async({{Table}}Request request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                await _{{Table}}Services.CreateAsync(request);
+                return Ok(new { message = "Elemento creado exitosamente" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocurrió un error al crear el elemento", error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            try
+            {
+                var {{Table}} = (List<{{Table}}>)_{{Table}}Services.GetAll();
+                if ({{Table}} == null || !{{Table}}.Any())
+                {
+                    return Ok(new { message = "No se encontraron elementos" });
+                }
+                return Ok(new { message = "Elementos recuperados exitosamente", data = {{Table}} });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocurrió un error al recuperar todos los elementos", error = ex.Message });
+            }
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetByIdAsync(Guid id)
+        {
+            try
+            {
+                var {{Table}} = ({{Table}})await _{{Table}}Services.GetByIdAsync(id);
+                if ({{Table}} == null)
+                {
+                    return NotFound(new { message = $"No se encontró el elemento con Id {id}." });
+                }
+                return Ok(new { message = $"Elemento con Id {id} recuperado exitosamente.", data = {{Table}} });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Ocurrió un error al recuperar el elemento con Id {id}.", error = ex.Message });
+            }
+        }
+        [HttpPut("{id:guid}")]
+
+        public async Task<IActionResult> Update{{Table}}Async(Guid id, {{Table}}Request request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var {{Table}} = await _{{Table}}Services.GetByIdAsync(id);
+                if ({{Table}} == null)
+                {
+                    return NotFound(new { message = $"Elemento con id {id} no encontrado" });
+                }
+                await _{{Table}}Services.UpdateAsync(id, request);
+                return Ok(new { message = $"Elemento con id {id} actualizado exitosamente" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Ocurrió un error al actualizar el elemento con id {id}", error = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete{{Table}}Async(Guid id)
+        {
+            try
+            {
+                await _{{Table}}Services.DeleteAsync(id);
+                return Ok(new { message = $"Elemento con id {id} eliminado exitosamente" });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Ocurrió un error al eliminar el elemento con id {id}", error = ex.Message });
+
+            }
+        }
+    }
+}

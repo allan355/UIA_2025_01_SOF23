@@ -1,0 +1,93 @@
+using AutoMapper;
+using CRUDGenerator.Contracts;
+using CRUDGenerator.Interfaces;
+using CRUDGenerator.Models;
+using CRUDGenerator.AppDataContext;
+
+namespace CRUDGenerator.Services
+{
+    public class {{Table}}Services : I{{Table}}Services
+    {
+        private readonly Context _context;
+        private readonly ILogger<{{Table}}Services> _logger;
+        private readonly IMapper _mapper;
+        public {{Table}}Services(Context context, ILogger<{{Table}}Services> logger, IMapper mapper)
+        {
+            _context = context;
+            _logger = logger;
+            _mapper = mapper;
+        }
+
+        public async Task CreateAsync(ContractBase request)
+        {
+            try
+            {
+                var {{Table}} = _mapper.Map<{{Table}}>(request);
+                _context.{{Table}}.Add({{Table}});
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ocurrió un error al crear el elemento {{Table}}.");
+                throw new Exception("Ocurrió un error al crear el elemento {{Table}}.");
+            }
+        }       
+
+        public IEnumerable<ModelBase> GetAll()
+        {
+            var {{Table}} = _context.{{Table}}.ToList();
+            if ({{Table}} == null)
+            {
+                throw new Exception("No se encontraron elementos {{Table}}");
+            }
+            return {{Table}};
+        }
+
+        public async Task<ModelBase> GetByIdAsync(Guid id)
+        {
+            var {{Table}} = await _context.{{Table}}.FindAsync(id);
+            if ({{Table}} == null)
+            {
+                throw new KeyNotFoundException($"No se encontró ningún elemento Sapmple con Id {id}.");
+            }
+            return {{Table}};
+        }
+
+        public async Task UpdateAsync(Guid id, ContractBase req)
+        {
+            try
+            {
+                var request = ({{Table}}Request)req;
+                var {{Table}} = await _context.{{Table}}.FindAsync(id);
+                if ({{Table}} == null)
+                {
+                    throw new Exception($"No se encontró el elemento {{Table}} con id {id}.");
+                }
+
+                {{IfProperties}}
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Ocurrió un error al actualizar el elemento {{Table}} con id {id}.");
+                throw;
+            }
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            var {{Table}} = await _context.{{Table}}.FindAsync(id);
+            if ({{Table}} != null)
+            {
+                _context.{{Table}}.Remove({{Table}});
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new Exception($"No se encontró ningún elemento con el id {id}");
+            }
+        }
+
+    }
+}

@@ -1,0 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace CRUDGenerator.Models
+{
+    public class {{Table}} : ModelBase
+    {
+        {{Properties}}
+
+        public {{Table}}()
+        {
+        }
+    }
+}

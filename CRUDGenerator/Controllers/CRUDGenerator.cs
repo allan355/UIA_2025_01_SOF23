@@ -31,6 +31,24 @@ namespace CRUDGenerator.Controllers
                 return StatusCode(500, new { message = "Ocurrió un error al crear el elemento", error = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("CCCC")]
+        public async Task<IActionResult> CreateCRUD(string request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var colunms = _GeneratorService.CreateCRUD(request);
+                return Ok(colunms);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocurrió un error al crear el elemento", error = ex.Message });
+            }
+        }
 
 
     }
