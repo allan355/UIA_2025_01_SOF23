@@ -57,7 +57,4 @@ void addScopes(WebApplicationBuilder builder)
 
     builder.Services.AddScoped<IGeneratorService, GeneratorService>();
     //Add here services:
-builder.Services.AddScoped<IPersonaServices, PersonaServices>();
-builder.Services.AddScoped<IAllanTestServices, AllanTestServices>();
-    //builder.Services.AddScoped<IServices, ProductServices>();
 }

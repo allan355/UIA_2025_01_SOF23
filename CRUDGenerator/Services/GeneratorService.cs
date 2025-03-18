@@ -3,8 +3,6 @@ using CRUDGenerator.AppDataContext;
 using CRUDGenerator.Interfaces;
 using CRUDGenerator.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using static System.Runtime.InteropServices.Marshalling.IIUnknownCacheStrategy;
 
 namespace CRUDGenerator.Services
 {
@@ -21,18 +19,13 @@ namespace CRUDGenerator.Services
             _mapper = mapper;
         }
 
-        public async Task<List<DBColums>> GetAllColums(string table)
+        public async Task<List<string>> GetAllTables()
         {
-            var sample = await _context.DBColums.Where(x => x.TABLE_NAME == table).ToListAsync();
-
-            foreach (var s in sample)
-            {
-                Console.WriteLine(s.TABLE_NAME);
-            }
+            var sample = await _context.DBColums.Select(x => x.TABLE_NAME).Distinct().ToListAsync();
 
             if (sample == null)
             {
-                throw new KeyNotFoundException($"No se encontró ningún elemento Sapmple con Id {table}.");
+                throw new KeyNotFoundException($"No se encontró ningún elemento.");
             }
             return sample;
         }
@@ -98,6 +91,8 @@ namespace CRUDGenerator.Services
             var lines = System.IO.File.ReadAllText(filePath);
             // Replace placeholders with actual values
             lines = lines.Replace("{{Table}}", NombreTable);
+            lines = lines.Replace("{{PK}}", tableInfo.Where(x => x.IS_PRIMARY_KEY).FirstOrDefault()?.COLUMN_NAME);
+            lines = lines.Replace("{{PKType}}", ConvertSQLTypeToCType(tableInfo.Where(x => x.IS_PRIMARY_KEY).FirstOrDefault()?.DATA_TYPE));
 
             // Save the generated content to a new file in the Models folder
             var outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Controllers", $"{NombreTable}Controller.cs");
@@ -119,7 +114,7 @@ namespace CRUDGenerator.Services
             // Replace placeholders with actual values
             lines = lines.Replace("{{Table}}", NombreTable);
             var properties = "";
-            foreach (var item in tableInfo)
+            foreach (var item in tableInfo.Where(x => !x.IS_PRIMARY_KEY))
             {
                 properties += $"public {ConvertSQLTypeToCType(item.DATA_TYPE)} {item.COLUMN_NAME} {{ get; set; }}\n";
             }
@@ -145,7 +140,7 @@ namespace CRUDGenerator.Services
             // Replace placeholders with actual values
             lines = lines.Replace("{{Table}}", NombreTable);
             var ifproperties = "";
-            foreach (var item in tableInfo)
+            foreach (var item in tableInfo.Where(x => !x.IS_PRIMARY_KEY))
             {
                 ifproperties += $"if (request.{item.COLUMN_NAME} != null)\n";
                 ifproperties += "{\n";
@@ -153,6 +148,7 @@ namespace CRUDGenerator.Services
                 ifproperties += "}\n";
             }
             lines = lines.Replace("{{IfProperties}}", ifproperties);
+            lines = lines.Replace("{{PKType}}", ConvertSQLTypeToCType(tableInfo.Where(x => x.IS_PRIMARY_KEY).FirstOrDefault()?.DATA_TYPE));
             // Save the generated content to a new file in the Models folder
             var outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Services", $"{NombreTable}Service.cs");
             System.IO.File.WriteAllText(outputFilePath, lines);
@@ -171,7 +167,8 @@ namespace CRUDGenerator.Services
             var lines = System.IO.File.ReadAllText(filePath);
             // Replace placeholders with actual values
             lines = lines.Replace("{{Table}}", NombreTable);
-          
+
+            lines = lines.Replace("{{PKType}}", ConvertSQLTypeToCType(tableInfo.Where(x => x.IS_PRIMARY_KEY).FirstOrDefault()?.DATA_TYPE));
             // Save the generated content to a new file in the Models folder
             var outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Interfaces", $"I{NombreTable}Service.cs");
             System.IO.File.WriteAllText(outputFilePath, lines);
@@ -278,7 +275,16 @@ namespace CRUDGenerator.Services
             var lines = System.IO.File.ReadAllLines(filePath);
             var newlines = new List<string>();
             // Replace placeholders with actual values
-            var property = $"CreateMap<{NombreTable}Request, {NombreTable}>();";
+            var pk = tableInfo.Where(x => x.IS_PRIMARY_KEY).FirstOrDefault()?.COLUMN_NAME;
+            var property = "";
+            if (pk != null)
+            {
+                property = $"CreateMap<{NombreTable}Request, {NombreTable}>().ForMember(x=>x.{pk},o=>o.Ignore());";
+            }
+            else
+            {
+                property = $"CreateMap<{NombreTable}Request, {NombreTable}>();";
+            }
             if (lines.Contains(property))
             {
                 return true;
@@ -308,11 +314,37 @@ namespace CRUDGenerator.Services
             return SQLType.ToLower() switch
             {
                 "int" => "int",
+                "bigint" => "long",
                 "varchar" => "string",
                 "datetime" => "DateTime",
                 "bit" => "bool",
                 "decimal" => "decimal",
                 "uniqueidentifier" => "Guid",
+                "float" => "float",
+                "text" => "string",
+                "char" => "string",
+                "nchar" => "string",
+                "nvarchar" => "string",
+                "ntext" => "string",
+                "date" => "DateTime",
+                "time" => "TimeSpan",
+                "datetime2" => "DateTime",
+                "datetimeoffset" => "DateTimeOffset",
+                "smallint" => "short",
+                "tinyint" => "byte",
+                "money" => "decimal",
+                "smallmoney" => "decimal",
+                "real" => "float",
+                "binary" => "byte[]",
+                "varbinary" => "byte[]",
+                "image" => "byte[]",
+                "xml" => "string",
+                "geography" => "string",
+                "geometry" => "string",
+                "hierarchyid" => "string",
+                "sql_variant" => "string",
+                "timestamp" => "byte[]",
+                "sysname" => "string",
                 _ => "string",
             };
         }

@@ -6,9 +6,9 @@ namespace CRUDGenerator.Interfaces
     public interface I{{Table}}Services
     {
         IEnumerable<ModelBase> GetAll();
-        Task<ModelBase> GetByIdAsync(Guid id);
+        Task<ModelBase> GetByIdAsync({{PKType}} id);
         Task CreateAsync(ContractBase request);
-        Task UpdateAsync(Guid id, ContractBase request);
-        Task DeleteAsync(Guid id);
+        Task UpdateAsync({{PKType}} id, ContractBase request);
+        Task DeleteAsync({{PKType}} id);
     }
 }

@@ -43,7 +43,7 @@ namespace CRUDGenerator.Services
             return {{Table}};
         }
 
-        public async Task<ModelBase> GetByIdAsync(Guid id)
+        public async Task<ModelBase> GetByIdAsync({{PKType}} id)
         {
             var {{Table}} = await _context.{{Table}}.FindAsync(id);
             if ({{Table}} == null)
@@ -53,7 +53,7 @@ namespace CRUDGenerator.Services
             return {{Table}};
         }
 
-        public async Task UpdateAsync(Guid id, ContractBase req)
+        public async Task UpdateAsync({{PKType}} id, ContractBase req)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace CRUDGenerator.Services
             }
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync({{PKType}} id)
         {
             var {{Table}} = await _context.{{Table}}.FindAsync(id);
             if ({{Table}} != null)

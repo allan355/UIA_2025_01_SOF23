@@ -1,5 +1,4 @@
-﻿using CRUDGenerator.Contracts;
-using CRUDGenerator.Interfaces;
+﻿using CRUDGenerator.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRUDGenerator.Controllers
@@ -15,7 +14,8 @@ namespace CRUDGenerator.Controllers
             _GeneratorService = GeneratorService;
         }
         [HttpGet]
-        public async Task<IActionResult> CreateSampleAsync(string request)
+        [Route("Tables")]
+        public async Task<IActionResult> CreateSampleAsync()
         {
             if (!ModelState.IsValid)
             {
@@ -23,7 +23,7 @@ namespace CRUDGenerator.Controllers
             }
             try
             {
-                var colunms = await _GeneratorService.GetAllColums(request);
+                var colunms = await _GeneratorService.GetAllTables();
                 return Ok(colunms);
             }
             catch (Exception ex)
@@ -31,8 +31,8 @@ namespace CRUDGenerator.Controllers
                 return StatusCode(500, new { message = "Ocurrió un error al crear el elemento", error = ex.Message });
             }
         }
-        [HttpGet]
-        [Route("CCCC")]
+        [HttpPost]
+        [Route("CreateCrud")]
         public async Task<IActionResult> CreateCRUD(string request)
         {
             if (!ModelState.IsValid)

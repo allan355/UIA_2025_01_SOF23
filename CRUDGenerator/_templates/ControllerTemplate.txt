@@ -51,26 +51,26 @@ namespace CRUDGenerator.Controllers
             }
         }
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetByIdAsync(Guid id)
+        [HttpGet("{{{PK}}:{{PKType}}}")]
+        public async Task<IActionResult> GetByIdAsync({{PKType}} {{PK}})
         {
             try
             {
-                var {{Table}} = ({{Table}})await _{{Table}}Services.GetByIdAsync(id);
+                var {{Table}} = ({{Table}})await _{{Table}}Services.GetByIdAsync({{PK}});
                 if ({{Table}} == null)
                 {
-                    return NotFound(new { message = $"No se encontró el elemento con Id {id}." });
+                    return NotFound(new { message = $"No se encontró el elemento con {{PK}} {{{PK}}}." });
                 }
-                return Ok(new { message = $"Elemento con Id {id} recuperado exitosamente.", data = {{Table}} });
+                return Ok(new { message = $"Elemento con {{PK}} {{{PK}}} recuperado exitosamente.", data = {{Table}} });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"Ocurrió un error al recuperar el elemento con Id {id}.", error = ex.Message });
+                return StatusCode(500, new { message = $"Ocurrió un error al recuperar el elemento con {{PK}} {{{PK}}}.", error = ex.Message });
             }
         }
-        [HttpPut("{id:guid}")]
+        [HttpPut("{{{PK}}:{{PKType}}}")]
 
-        public async Task<IActionResult> Update{{Table}}Async(Guid id, {{Table}}Request request)
+        public async Task<IActionResult> Update{{Table}}Async({{PKType}} {{PK}}, {{Table}}Request request)
         {
             if (!ModelState.IsValid)
             {
@@ -78,32 +78,32 @@ namespace CRUDGenerator.Controllers
             }
             try
             {
-                var {{Table}} = await _{{Table}}Services.GetByIdAsync(id);
+                var {{Table}} = await _{{Table}}Services.GetByIdAsync({{PK}});
                 if ({{Table}} == null)
                 {
-                    return NotFound(new { message = $"Elemento con id {id} no encontrado" });
+                    return NotFound(new { message = $"Elemento con {{PK}} {{{PK}}} no encontrado" });
                 }
-                await _{{Table}}Services.UpdateAsync(id, request);
-                return Ok(new { message = $"Elemento con id {id} actualizado exitosamente" });
+                await _{{Table}}Services.UpdateAsync({{PK}}, request);
+                return Ok(new { message = $"Elemento con {{PK}} {{{PK}}} actualizado exitosamente" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"Ocurrió un error al actualizar el elemento con id {id}", error = ex.Message });
+                return StatusCode(500, new { message = $"Ocurrió un error al actualizar el elemento con id {{{PK}}}", error = ex.Message });
             }
         }
 
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete{{Table}}Async(Guid id)
+        [HttpDelete("{{{PK}}:{{PKType}}}")]
+        public async Task<IActionResult> Delete{{Table}}Async({{PKType}} {{PK}})
         {
             try
             {
-                await _{{Table}}Services.DeleteAsync(id);
-                return Ok(new { message = $"Elemento con id {id} eliminado exitosamente" });
+                await _{{Table}}Services.DeleteAsync({{PK}});
+                return Ok(new { message = $"Elemento con {{PK}} {{{PK}}} eliminado exitosamente" });
 
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"Ocurrió un error al eliminar el elemento con id {id}", error = ex.Message });
+                return StatusCode(500, new { message = $"Ocurrió un error al eliminar el elemento con {{PK}} {{{PK}}}", error = ex.Message });
 
             }
         }

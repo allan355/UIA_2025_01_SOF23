@@ -1,6 +1,4 @@
 using AutoMapper;
-using CRUDGenerator.Contracts;
-using CRUDGenerator.Models;
 
 namespace CRUDGenerator.MappingProfiles
 {
@@ -9,8 +7,6 @@ namespace CRUDGenerator.MappingProfiles
         public AutoMapperProfile()
         {
           //add more mappings here:
-CreateMap<AllanTestRequest, AllanTest>();
-CreateMap<PersonaRequest, Persona>();
         }
     }
 }
