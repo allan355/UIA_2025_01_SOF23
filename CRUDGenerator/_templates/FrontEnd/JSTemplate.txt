@@ -1,0 +1,116 @@
+﻿function loadTable() {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "{{URL}}/{{Table}}");
+    xhttp.send();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(this.responseText);
+            var trHTML = "";
+            const objects = JSON.parse(this.responseText);
+            console.log(objects["data"])
+            for (let object of objects["data"]) {
+                trHTML += "<tr>";
+                {{loadTableProperties}}
+                trHTML +=
+                    `<td><button type="button" class="btn btn-outline-secondary" onclick="showEditBox('${object["{{PK}}"]}')">Edit</button>`;
+                trHTML +=
+                    `<button type="button" class="btn btn-outline-danger" onclick="Delete('${object["{{PK}}"]}')">Del</button></td>`;
+                trHTML += "</tr>";
+            }
+            document.getElementById("mytable").innerHTML = trHTML;
+        }
+    };
+}
+
+function showCreateBox({{PK}}) {
+    Swal.fire({
+        title: "Create {{Table}}",
+        html:
+            {{showCreateProperties}}
+        focusConfirm: false,
+        preConfirm: () => {
+            Create();
+        },
+    });
+}
+
+function Create() {
+    {{columnsMethodProperties}}
+
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "{{URL}}/{{Table}}");
+    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhttp.send(
+        JSON.stringify({
+            {{JSONProperties}}
+        })
+    );
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            const objects = JSON.parse(this.responseText);
+            Swal.fire(objects["message"]);
+            loadTable();
+        }
+    };
+}
+
+function showEditBox({{PK}}) {
+    console.log("{{URL}}/{{Table}}/" + {{PK}});
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "{{URL}}/{{Table}}/" + {{PK}});
+    xhttp.send();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            const objects = JSON.parse(this.responseText)["data"];
+            const {{Table}} = objects;
+        console.log({{Table}});
+            Swal.fire({
+                title: "Edit {{Table}}",
+                html:
+                    {{showCreateProperties}}
+                focusConfirm: false,
+                preConfirm: () => {
+                    Edit();
+                },
+            });
+        }
+    };
+}
+
+function Edit() {
+    {{columnsMethodProperties}}
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("PUT", "{{URL}}/{{Table}}/"+{{PK}});
+    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhttp.send(
+        JSON.stringify({
+            {{JSONProperties}}
+        })
+    );
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            const objects = JSON.parse(this.responseText);
+            Swal.fire(objects["message"]);
+            loadTable();
+        }
+    };
+}
+
+function Delete({{PK}}) {
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("DELETE", "{{URL}}/{{Table}}/" + {{PK}});
+    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhttp.send();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            const objects = JSON.parse(this.responseText);
+            Swal.fire(objects["message"]);
+            loadTable();
+        }
+    };
+}
+
+
+loadTable();

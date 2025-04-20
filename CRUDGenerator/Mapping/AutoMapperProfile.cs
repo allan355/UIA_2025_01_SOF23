@@ -1,4 +1,6 @@
 using AutoMapper;
+using CRUDGenerator.Contracts;
+using CRUDGenerator.Models;
 
 namespace CRUDGenerator.MappingProfiles
 {

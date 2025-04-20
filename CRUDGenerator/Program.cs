@@ -7,6 +7,21 @@ using CRUDGenerator.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#region a
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
+
+
+
+#endregion
+
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -34,6 +49,7 @@ var app = builder.Build();
     using var scope = app.Services.CreateScope(); // Add this line
     var context = scope.ServiceProvider; // Add this line
 }
+app.UseCors("AllowAll");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

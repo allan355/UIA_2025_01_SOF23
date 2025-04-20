@@ -1,5 +1,4 @@
-USE [Paradigmas]
-GO
+
 
 /****** Object:  View [dbo].[DBColums]    Script Date: 3/17/2025 9:59:55 PM ******/
 SET ANSI_NULLS ON
@@ -8,12 +7,12 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE VIEW [dbo].[DBColums] AS
+alter VIEW [dbo].[DBColums] AS
 SELECT 
     ROW_NUMBER() OVER (ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, c.ORDINAL_POSITION) AS ROW_NUM, -- Adds row numbers
     c.TABLE_SCHEMA, 
     c.TABLE_NAME, 
-    c.COLUMN_NAME, 
+    lower(c.COLUMN_NAME) COLUMN_NAME, 
     c.ORDINAL_POSITION, 
     c.IS_NULLABLE, 
     c.DATA_TYPE,

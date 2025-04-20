@@ -3,6 +3,8 @@ using CRUDGenerator.AppDataContext;
 using CRUDGenerator.Interfaces;
 using CRUDGenerator.Models;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Runtime.Intrinsics.X86;
 
 namespace CRUDGenerator.Services
 {
@@ -51,6 +53,10 @@ namespace CRUDGenerator.Services
                 flag = false;
             if (!AddMAppingValues(NombreTable, tableInfo))
                 flag = false;
+            if (!CreateHTML(NombreTable, tableInfo))
+                flag = false;
+            if (!CreateJS(NombreTable, tableInfo))
+                flag = false;
 
             return true;
         }
@@ -70,7 +76,7 @@ namespace CRUDGenerator.Services
             var properties = "";
             foreach (var item in tableInfo)
             {
-                properties += $"public {ConvertSQLTypeToCType(item.DATA_TYPE)} {item.COLUMN_NAME} {{ get; set; }}\n";
+                properties += $"public {ConvertSQLTypeToCType(item.DATA_TYPE)} {item.COLUMN_NAME} {{ get; set; }}{Environment.NewLine}";
             }
             lines = lines.Replace("{{Properties}}", properties);
 
@@ -100,7 +106,6 @@ namespace CRUDGenerator.Services
 
             return true;
         }
-
         public bool CreateContract(string NombreTable, List<DBColums> tableInfo)
         {
 
@@ -116,7 +121,7 @@ namespace CRUDGenerator.Services
             var properties = "";
             foreach (var item in tableInfo.Where(x => !x.IS_PRIMARY_KEY))
             {
-                properties += $"public {ConvertSQLTypeToCType(item.DATA_TYPE)} {item.COLUMN_NAME} {{ get; set; }}\n";
+                properties += $"public {ConvertSQLTypeToCType(item.DATA_TYPE)} {item.COLUMN_NAME} {{ get; set; }}{Environment.NewLine}";
             }
             lines = lines.Replace("{{Properties}}", properties);
 
@@ -126,7 +131,6 @@ namespace CRUDGenerator.Services
 
             return true;
         }
-
         public bool CreateService(string NombreTable, List<DBColums> tableInfo)
         {
 
@@ -142,10 +146,10 @@ namespace CRUDGenerator.Services
             var ifproperties = "";
             foreach (var item in tableInfo.Where(x => !x.IS_PRIMARY_KEY))
             {
-                ifproperties += $"if (request.{item.COLUMN_NAME} != null)\n";
-                ifproperties += "{\n";
-                ifproperties += $"    {NombreTable}.{item.COLUMN_NAME} = request.{item.COLUMN_NAME};\n";
-                ifproperties += "}\n";
+                ifproperties += $"if (request.{item.COLUMN_NAME} != null){Environment.NewLine}";
+                ifproperties += "{ "+Environment.NewLine;
+                ifproperties += $"    {NombreTable}.{item.COLUMN_NAME} = request.{item.COLUMN_NAME};{Environment.NewLine}";
+                ifproperties += "} " + Environment.NewLine;
             }
             lines = lines.Replace("{{IfProperties}}", ifproperties);
             lines = lines.Replace("{{PKType}}", ConvertSQLTypeToCType(tableInfo.Where(x => x.IS_PRIMARY_KEY).FirstOrDefault()?.DATA_TYPE));
@@ -175,7 +179,6 @@ namespace CRUDGenerator.Services
 
             return true;
         }
-
         public bool AddContextValues(string NombreTable, List<DBColums> tableInfo)
         {
 
@@ -223,7 +226,7 @@ namespace CRUDGenerator.Services
 
             // Save the generated content to a new file in the Models folder
             var outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), "AppDataContext", "Context.cs");
-            System.IO.File.WriteAllText(outputFilePath, string.Join('\n', newlines));
+            System.IO.File.WriteAllText(outputFilePath, string.Join(Environment.NewLine, newlines));
 
             return true;
         }
@@ -259,7 +262,7 @@ namespace CRUDGenerator.Services
 
             // Save the generated content to a new file in the Models folder
             var outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), "", "Program.cs");
-            System.IO.File.WriteAllText(outputFilePath, string.Join('\n', newlines));
+            System.IO.File.WriteAllText(outputFilePath, string.Join(Environment.NewLine, newlines));
 
             return true;
         }
@@ -304,11 +307,83 @@ namespace CRUDGenerator.Services
 
             // Save the generated content to a new file in the Models folder
             var outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Mapping", "AutoMapperProfile.cs");
-            System.IO.File.WriteAllText(outputFilePath, string.Join('\n', newlines));
+            System.IO.File.WriteAllText(outputFilePath, string.Join(Environment.NewLine, newlines));
 
             return true;
         }
+        public bool CreateHTML(string NombreTable, List<DBColums> tableInfo)
+        {
 
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"_templates\FrontEnd", "HTMLTemplate.txt");
+            if (!System.IO.File.Exists(filePath))
+            {
+                throw new Exception("El archivo no existe");
+            }
+            var lines = System.IO.File.ReadAllText(filePath);
+            // Replace placeholders with actual values
+            lines = lines.Replace("{{Table}}", NombreTable);
+            lines = lines.Replace("{{ProjectName}}", "Proyeco Paradigmas 2025");
+            var Properties = "";
+            foreach (var item in tableInfo)
+            {
+                Properties += $"<th scope=\"col\">{item.COLUMN_NAME}</th>{Environment.NewLine}";
+            }
+            lines = lines.Replace("{{Properties}}", Properties);
+
+            // Save the generated content to a new file in the Models folder
+            var outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), @"FrontEnd\views", $"{NombreTable}.html");
+            System.IO.File.WriteAllText(outputFilePath, lines);
+
+            return true;
+        }
+        public bool CreateJS(string NombreTable, List<DBColums> tableInfo)
+        {
+
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"_templates\FrontEnd", "JSTemplate.txt");
+            if (!System.IO.File.Exists(filePath))
+            {
+                throw new Exception("El archivo no existe");
+            }
+
+            var lines = System.IO.File.ReadAllText(filePath);
+            // Replace placeholders with actual values
+            lines = lines.Replace("{{Table}}", NombreTable);
+            lines = lines.Replace("{{PK}}", tableInfo.Where(x => x.IS_PRIMARY_KEY).FirstOrDefault()?.COLUMN_NAME);
+            lines = lines.Replace("{{URL}}", "https://localhost:7038/api");
+
+            var loadTableProperties = "";
+            var showCreateProperties = "";
+            var columnsMethodProperties = "";
+            var JSONProperties = "";
+            foreach (var item in tableInfo)
+            {
+                if (item.IS_PRIMARY_KEY == true)
+                {
+                    loadTableProperties += $"trHTML += '<td>' + object['{item.COLUMN_NAME}'] + '</td>';{Environment.NewLine}";
+                    showCreateProperties += $"'<input id=\"{item.COLUMN_NAME}\" type=\"hidden\" value=\"'+{item.COLUMN_NAME}+'\" >'+{Environment.NewLine}";
+                    columnsMethodProperties += $"const {item.COLUMN_NAME} = document.getElementById(\"{item.COLUMN_NAME}\").value;{Environment.NewLine}";
+                }
+                else
+                {
+                    loadTableProperties += $"trHTML += '<td>' + object['{item.COLUMN_NAME}'] + '</td>';{Environment.NewLine}";
+                    showCreateProperties += $"'<input id=\"{item.COLUMN_NAME}\" class=\"swal2-input\" placeholder=\"{item.COLUMN_NAME}\">' +{Environment.NewLine}";
+                    columnsMethodProperties += $"const {item.COLUMN_NAME} = document.getElementById(\"{item.COLUMN_NAME}\").value;{Environment.NewLine}";
+                    JSONProperties += $" {item.COLUMN_NAME}: {item.COLUMN_NAME},{Environment.NewLine}";
+                }
+            }
+            int lastIndex = showCreateProperties.LastIndexOf('+');
+            showCreateProperties = showCreateProperties.Substring(0, lastIndex) + ',' + showCreateProperties.Substring(lastIndex + 1);
+
+            lines = lines.Replace("{{loadTableProperties}}", loadTableProperties);
+            lines = lines.Replace("{{showCreateProperties}}", showCreateProperties);
+            lines = lines.Replace("{{columnsMethodProperties}}", columnsMethodProperties);
+            lines = lines.Replace("{{JSONProperties}}", JSONProperties);
+            // Save the generated content to a new file in the Models folder
+            var outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), @"FrontEnd\js", $"{NombreTable}.js");
+            System.IO.File.WriteAllText(outputFilePath, lines);
+
+            return true;
+        }
         public string ConvertSQLTypeToCType(string SQLType)
         {
             return SQLType.ToLower() switch

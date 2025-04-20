@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRUDGenerator", "CRUDGenerator.csproj", "{409ED74B-4DB0-7D7E-3446-5C3DB26ECAAC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{409ED74B-4DB0-7D7E-3446-5C3DB26ECAAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{409ED74B-4DB0-7D7E-3446-5C3DB26ECAAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{409ED74B-4DB0-7D7E-3446-5C3DB26ECAAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{409ED74B-4DB0-7D7E-3446-5C3DB26ECAAC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8543859C-E21D-4835-9CFA-63FB1CE0895D}
+	EndGlobalSection
+EndGlobal
